@@ -51,8 +51,8 @@ const createEnseignement = async (req, res) => {
     const publishedAt = now;
 
     // Extraire mois et année si fournis, sinon utiliser la date actuelle
-    const mois = parseInt(req.body.mois) || now.getMonth() + 1; // +1 car les mois commencent à 0
-    const annee = parseInt(req.body.annee) || now.getFullYear();
+    const mois = req.body.mois?.toString() || (now.getMonth() + 1).toString(); // +1 car les mois commencent à 0
+    const annee = req.body.annee?.toString() || now.getFullYear().toString();
 
     // Créer l'objet enseignement (compatible avec le modèle Flutter)
     const enseignementData = {
@@ -73,6 +73,7 @@ const createEnseignement = async (req, res) => {
       updatedAt: now,
       mois: mois,
       annee: annee,
+      typeCulte: req.body.typeCulte || 'Culte de Louange',
       imagePublicId: imageResult.public_id,
       audioPublicId: audioResult.public_id
     };
@@ -121,8 +122,9 @@ const getAllEnseignements = async (req, res) => {
         publishedAt: data.publishedAt?.toDate() || new Date(),
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate() || new Date(),
-        mois: data.mois || new Date().getMonth() + 1, // Par défaut mois actuel
-        annee: data.annee || new Date().getFullYear(), // Par défaut année actuelle
+        mois: data.mois?.toString() || (new Date().getMonth() + 1).toString(), // Par défaut mois actuel
+        annee: data.annee?.toString() || new Date().getFullYear().toString(), // Par défaut année actuelle
+        typeCulte: data.typeCulte?.toString() || 'Culte de Louange', // Par défaut
       };
 
       enseignements.push(teachingData);
