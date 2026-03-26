@@ -96,25 +96,25 @@ export default function EnseignementList({ enseignements, onRefresh, viewMode = 
                 <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
                   {enseignement.title}
                 </h3>
-                <div className="relative" ref={(el) => { menuRefs.current[enseignement.id] = el; }}>
+                <div className="relative" ref={(el) => { if (enseignement.id) menuRefs.current[enseignement.id] = el; }}>
                   <button
-                    onClick={() => setOpenMenuId(openMenuId === enseignement.id ? null : enseignement.id)}
+                    onClick={() => setOpenMenuId(openMenuId === enseignement.id ? null : enseignement.id || null)}
                     className="text-gray-400 hover:text-gray-600"
                     disabled={deletingId === enseignement.id}
                   >
                     <EllipsisVerticalIcon className="h-5 w-5" />
                   </button>
-                    {openMenuId === enseignement.id && (
+                    {openMenuId === enseignement.id && enseignement.id && (
                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
                         <button
-                          onClick={() => handleEdit(enseignement.id)}
+                          onClick={() => handleEdit(enseignement.id!)}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
                         >
                           <PencilIcon className="h-4 w-4" />
                           <span>Modifier</span>
                         </button>
                         <button
-                          onClick={() => handleDelete(enseignement.id, enseignement.title)}
+                          onClick={() => handleDelete(enseignement.id!, enseignement.title)}
                           className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"
                           disabled={deletingId === enseignement.id}
                         >
@@ -220,25 +220,25 @@ export default function EnseignementList({ enseignements, onRefresh, viewMode = 
                       <p className="text-sm text-gray-600 mb-3 line-clamp-2">{enseignement.description}</p>
                     )}
                   </div>
-                  <div className="relative ml-4" ref={(el) => { menuRefs.current[enseignement.id] = el; }}>
+                  <div className="relative ml-4" ref={(el) => { if (enseignement.id) menuRefs.current[enseignement.id] = el; }}>
                     <button
-                      onClick={() => setOpenMenuId(openMenuId === enseignement.id ? null : enseignement.id)}
+                      onClick={() => setOpenMenuId(openMenuId === enseignement.id ? null : enseignement.id || null)}
                       className="text-gray-400 hover:text-gray-600"
                       disabled={deletingId === enseignement.id}
                     >
                       <EllipsisVerticalIcon className="h-5 w-5" />
                     </button>
-                    {openMenuId === enseignement.id && (
+                    {openMenuId === enseignement.id && enseignement.id && (
                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
                         <button
-                          onClick={() => handleEdit(enseignement.id)}
+                          onClick={() => handleEdit(enseignement.id!)}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
                         >
                           <PencilIcon className="h-4 w-4" />
                           <span>Modifier</span>
                         </button>
                         <button
-                          onClick={() => handleDelete(enseignement.id, enseignement.title)}
+                          onClick={() => handleDelete(enseignement.id!, enseignement.title)}
                           className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"
                           disabled={deletingId === enseignement.id}
                         >
