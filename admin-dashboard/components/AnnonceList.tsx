@@ -44,7 +44,17 @@ export default function AnnonceList({ annonces, onRefresh }: AnnonceListProps) {
                 </p>
                 {annonce.dateCreation && (
                   <p className="text-xs text-gray-500">
-                    Créée le {format(new Date(annonce.dateCreation), 'dd MMMM yyyy à HH:mm', { locale: fr })}
+                    {(() => {
+                      try {
+                        const date = new Date(annonce.dateCreation!);
+                        if (isNaN(date.getTime())) {
+                          return 'Date invalide';
+                        }
+                        return `Créée le ${format(date, 'dd MMMM yyyy à HH:mm', { locale: fr })}`;
+                      } catch {
+                        return 'Date invalide';
+                      }
+                    })()}
                   </p>
                 )}
               </div>
