@@ -156,6 +156,7 @@ export default function LiveForm({ onSubmit, mode = 'full' }: LiveFormProps) {
             scheduledAt: '',
             tags: '',
             status: 'scheduled',
+            serverIP: '',
           });
         }
         
