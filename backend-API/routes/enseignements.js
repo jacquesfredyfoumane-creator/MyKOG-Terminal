@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { upload } = require('../middleware/upload');
-const { createEnseignement, getAllEnseignements, updateEnseignement } = require('../controllers/enseignementController');
+const { createEnseignement, getAllEnseignements, updateEnseignement, deleteEnseignement } = require('../controllers/enseignementController');
 
 // Route pour créer un enseignement
 router.post('/',
@@ -12,7 +12,13 @@ router.post('/',
 // Route pour récupérer tous les enseignements
 router.get('/', getAllEnseignements);
 
-// Route pour mettre à jour un enseignement
-router.put('/:id', updateEnseignement);
+// Route pour mettre à jour un enseignement (avec support pour upload d'image optionnel)
+router.put('/:id', 
+  upload.fields([{ name: 'image', maxCount: 1 }]),
+  updateEnseignement
+);
+
+// Route pour supprimer un enseignement
+router.delete('/:id', deleteEnseignement);
 
 module.exports = router;

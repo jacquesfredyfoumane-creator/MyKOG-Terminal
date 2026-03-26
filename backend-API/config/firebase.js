@@ -14,10 +14,31 @@ const serviceAccount = {
   client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL
 };
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+// Initialiser Firebase avec gestion d'erreur améliorée
+let firebaseApp;
+try {
+  // Vérifier si Firebase est déjà initialisé
+  if (admin.apps.length === 0) {
+    firebaseApp = admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
+    console.log('✅ Firebase Admin SDK initialisé');
+  } else {
+    firebaseApp = admin.app();
+    console.log('✅ Firebase Admin SDK déjà initialisé');
+  }
+} catch (error) {
+  console.error('❌ Erreur initialisation Firebase:', error);
+  // Continuer quand même pour ne pas bloquer le serveur
+}
 
 const db = admin.firestore();
+
+// Configurer Firestore avec des timeouts plus longs
+if (db) {
+  db.settings({
+    ignoreUndefinedProperties: true,
+  });
+}
 
 module.exports = { admin, db };

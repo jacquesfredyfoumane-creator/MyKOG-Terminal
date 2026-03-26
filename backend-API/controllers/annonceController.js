@@ -1,4 +1,5 @@
 const { db } = require('../config/firebase');
+const { sendNotificationToAllUsers } = require('../utils/notificationHelper');
 
 const createAnnonce = async (req, res) => {
   try {
@@ -20,6 +21,23 @@ const createAnnonce = async (req, res) => {
 
     // Sauvegarder dans Firestore
     const docRef = await db.collection('annonces').add(annonceData);
+
+    // Envoyer une notification push à tous les utilisateurs
+    try {
+      await sendNotificationToAllUsers({
+        title: '📢 Nouvelle annonce',
+        body: nom,
+        data: {
+          id: docRef.id,
+          type: 'annonce',
+          annonceId: docRef.id,
+        },
+        type: 'annonce',
+      });
+    } catch (notifError) {
+      console.error('Erreur envoi notification annonce:', notifError);
+      // Ne pas bloquer la réponse si la notification échoue
+    }
 
     res.status(201).json({
       id: docRef.id,

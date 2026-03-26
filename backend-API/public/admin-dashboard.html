@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Live Streaming MyKOG</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .current-live {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .current-live h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .current-live p {
+            color: #666;
+            font-size: 14px;
+            word-break: break-all;
+        }
+
+        .live-badge {
+            display: inline-block;
+            background: #dc3545;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎥 Dashboard Live Streaming</h1>
+        <p class="subtitle">Gérez votre live Facebook en temps réel</p>
+
+        <div class="current-live" id="currentLive">
+            <h3>Live Actuel <span class="live-badge">LIVE</span></h3>
+            <p id="currentUrl">Chargement...</p>
+        </div>
+
+        <form id="liveForm">
+            <div class="form-group">
+                <label for="liveUrl">🔗 URL du Live Facebook *</label>
+                <input 
+                    type="url" 
+                    id="liveUrl" 
+                    name="liveUrl" 
+                    placeholder="https://facebook.com/live/123456789 ou https://video.xx.fbcdn.net/hls-live/xxx/xxx.m3u8"
+                    required
+                >
+                <p class="help-text">
+                    Collez ici le lien du live Facebook (page ou flux HLS .m3u8)
+                </p>
+            </div>
+
+            <div class="form-group">
+                <label for="title">📝 Titre du Live</label>
+                <input 
+                    type="text" 
+                    id="title" 
+                    name="title" 
+                    placeholder="Ex: Culte du Dimanche - 10h00"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="pastor">👤 Pasteur / Prédicateur</label>
+                <input 
+                    type="text" 
+                    id="pastor" 
+                    name="pastor" 
+                    placeholder="Ex: Pasteur John Doe"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="description">📄 Description (optionnel)</label>
+                <textarea 
+                    id="description" 
+                    name="description" 
+                    placeholder="Description du live..."
+                ></textarea>
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn">
+                🚀 Publier le Live
+            </button>
+        </form>
+
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = window.location.origin; // Utilise l'URL actuelle
+        let currentLiveId = null;
+
+        // Charger le live actuel au démarrage
+        async function loadCurrentLive() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/lives`);
+                const lives = await response.json();
+                
+                // Trouver le live actif (status = 'live')
+                const activeLive = lives.find(l => l.status === 'live');
+                
+                if (activeLive) {
+                    currentLiveId = activeLive.id;
+                    document.getElementById('currentUrl').textContent = activeLive.streamUrl || 'Aucune URL';
+                    document.getElementById('liveUrl').value = activeLive.streamUrl || '';
+                    document.getElementById('title').value = activeLive.title || '';
+                    document.getElementById('pastor').value = activeLive.pastor || '';
+                    document.getElementById('description').value = activeLive.description || '';
+                } else {
+                    document.getElementById('currentUrl').textContent = 'Aucun live actif';
+                }
+            } catch (error) {
+                console.error('Erreur chargement live:', error);
+                document.getElementById('currentUrl').textContent = 'Erreur de chargement';
+            }
+        }
+
+        // Gérer la soumission du formulaire
+        document.getElementById('liveForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const statusDiv = document.getElementById('status');
+            
+            // Désactiver le bouton
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading"></span> Publication en cours...';
+            statusDiv.style.display = 'none';
+
+            const formData = {
+                streamUrl: document.getElementById('liveUrl').value.trim(),
+                title: document.getElementById('title').value.trim() || 'Live en cours',
+                pastor: document.getElementById('pastor').value.trim() || 'MyKOG',
+                description: document.getElementById('description').value.trim() || '',
+            };
+
+            try {
+                let response;
+                
+                if (currentLiveId) {
+                    // Mettre à jour le live existant
+                    response = await fetch(`${API_BASE_URL}/api/lives/${currentLiveId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            ...formData,
+                            status: 'live',
+                        }),
+                    });
+                } else {
+                    // Créer un nouveau live
+                    response = await fetch(`${API_BASE_URL}/api/lives`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            ...formData,
+                            status: 'live',
+                        }),
+                    });
+                }
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    currentLiveId = data.id || currentLiveId;
+                    
+                    // Afficher le succès
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = '✅ Live publié avec succès ! L\'application va se mettre à jour automatiquement.';
+                    statusDiv.style.display = 'block';
+                    
+                    // Recharger les infos
+                    await loadCurrentLive();
+                    
+                    // Réinitialiser le formulaire (garder les valeurs)
+                    setTimeout(() => {
+                        statusDiv.style.display = 'none';
+                    }, 5000);
+                } else {
+                    throw new Error(data.error || 'Erreur lors de la publication');
+                }
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ Erreur: ${error.message}`;
+                statusDiv.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Publier le Live';
+            }
+        });
+
+        // Charger au démarrage
+        loadCurrentLive();
+
+        // Recharger toutes les 30 secondes
+        setInterval(loadCurrentLive, 30000);
+    </script>
+</body>
+</html>
+
