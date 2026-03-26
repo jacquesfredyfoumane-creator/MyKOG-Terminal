@@ -110,6 +110,10 @@ export default function CalendarForm({ event, onSubmit, onCancel }: CalendarForm
         category: 'Culte',
         color: '#d4af37',
         isAllDay: false,
+        hasAlarm: false,
+        alarmDaysBefore: 0,
+        alarmHoursBefore: 0,
+        alarmMinutesBefore: 15,
       });
       
       setTimeout(() => {
