@@ -1,0 +1,26 @@
+services:
+  # Service Web pour l'API backend
+  - type: web
+    name: mykog-backend-api
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    
+    # Configuration des variables d'environnement
+    envVars:
+      # Variables à configurer dans le dashboard Render
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+        
+    # Configuration du déploiement
+    autoDeploy: yes
+    
+    # Health check
+    healthCheckPath: /
+    
+    # Configuration du domaine
+    domains:
+      - mykog-backend-api.onrender.com
