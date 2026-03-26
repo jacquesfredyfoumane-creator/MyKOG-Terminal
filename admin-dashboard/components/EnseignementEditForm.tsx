@@ -64,6 +64,10 @@ export default function EnseignementEditForm({ enseignement, onCancel, onSuccess
         formDataToSend.append('image', imageFile);
       }
 
+      if (!enseignement.id) {
+        throw new Error('ID de l\'enseignement manquant');
+      }
+
       await enseignementsApi.update(enseignement.id, formDataToSend, true);
       setSuccess(true);
       
