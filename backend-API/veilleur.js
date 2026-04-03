@@ -5,7 +5,10 @@ class Veilleur {
     this.intervalMinutes = intervalMinutes;
     this.intervalMs = intervalMinutes * 60 * 1000;
     this.intervalId = null;
-    this.url = process.env.RENDER_URL || `http://localhost:${process.env.PORT || 3000}`;
+    // Utiliser l'URL externe en production, localhost en local
+    this.url = process.env.RENDER_URL || (process.env.NODE_ENV === 'production' 
+      ? 'https://mykog-backend-api.onrender.com' 
+      : `http://localhost:${process.env.PORT || 3000}`);
   }
 
   start() {
@@ -33,13 +36,13 @@ class Veilleur {
     const options = {
       hostname: urlObj.hostname,
       port: urlObj.port || (isHttps ? 443 : 80),
-      path: '/',
+      path: '/api/enseignements', // Ping l'endpoint API au lieu de /
       method: 'GET',
       headers: {
         'User-Agent': 'MyKOG-Veilleur/1.0',
         'X-Veilleur-Ping': 'true'
       },
-      timeout: 10000
+      timeout: 15000 // Timeout plus long pour Render
     };
 
     const req = client.request(options, (res) => {
@@ -61,7 +64,7 @@ class Veilleur {
     });
 
     req.on('timeout', () => {
-      console.error(`⏰ Timeout du ping après 10 secondes`);
+      console.error(`⏰ Timeout du ping après 15 secondes`);
       req.destroy();
     });
 
