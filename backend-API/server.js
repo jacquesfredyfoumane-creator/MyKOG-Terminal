@@ -3,6 +3,9 @@ const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
 const Veilleur = require("./veilleur");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./config/swagger");
+const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,7 +27,32 @@ app.use("/api/users", require("./routes/users"));
 app.use("/api/notifications", require("./routes/notifications"));
 app.use("/api/text-resumes", require("./routes/textResumes"));
 
-// --- ROUTE DE TEST ---
+// --- SWAGGER DOCS (local files) ---
+const swaggerUiDistPath = path.join(__dirname, 'node_modules', 'swagger-ui-dist');
+app.use("/api-docs", express.static(swaggerUiDistPath));
+app.get("/api-docs", (req, res) => {
+  res.sendFile(path.join(swaggerUiDistPath, 'index.html'));
+});
+app.get("/api-docs/swagger.json", (req, res) => {
+  res.json(swaggerSpec);
+});
+
+/**
+ * @openapi
+ * /:
+ *   get:
+ *     summary: Page d'accueil de l'API
+ *     responses:
+ *       200:
+ *         description: API opérationnelle
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
 app.get("/", (req, res) => {
   res.json({ message: "Serveur Enseignement API opérationnel 🚀" });
 });
