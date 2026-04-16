@@ -78,7 +78,7 @@ app.listen(PORT, () => {
   
   // Démarrer le veilleur uniquement en production
   if (process.env.NODE_ENV === 'production') {
-    console.log("🌐 Serveur déployé sur Render");
+    console.log(`🌐 Serveur déployé sur ${process.env.RAILWAY_PUBLIC_DOMAIN ? 'Railway' : 'Render'}`);
     const veilleur = new Veilleur(14); // Ping toutes les 14 minutes
     veilleur.start();
   } else {

@@ -6,9 +6,11 @@ class Veilleur {
     this.intervalMs = intervalMinutes * 60 * 1000;
     this.intervalId = null;
     // Utiliser l'URL externe en production, localhost en local
-    this.url = process.env.RENDER_URL || (process.env.NODE_ENV === 'production' 
-      ? 'https://mykog-backend-api.onrender.com' 
-      : `http://localhost:${process.env.PORT || 3000}`);
+    this.url = process.env.RAILWAY_PUBLIC_DOMAIN
+      ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
+      : process.env.RENDER_URL || (process.env.NODE_ENV === 'production'
+        ? 'https://mykog-backend-api.onrender.com'
+        : `http://localhost:${process.env.PORT || 3000}`);
   }
 
   start() {
