@@ -6,11 +6,13 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start -p 3001",
+    "veilleur": "node veilleur.js",
     "lint": "eslint"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "date-fns": "^4.1.0",
+    "livekit-client": "^2.18.3",
     "next": "16.0.7",
     "react": "19.2.0",
     "react-dom": "19.2.0"

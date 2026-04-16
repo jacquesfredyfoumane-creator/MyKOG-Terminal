@@ -14,6 +14,7 @@ import {
   Cog6ToothIcon,
   TrashIcon,
   DocumentTextIcon,
+  SignalIcon,
 } from '@heroicons/react/24/outline';
 import {
   HomeIcon as HomeIconSolid,
@@ -25,6 +26,7 @@ import {
   UserGroupIcon as UserGroupIconSolid,
   BellIcon as BellIconSolid,
   DocumentTextIcon as DocumentTextIconSolid,
+  SignalIcon as SignalIconSolid,
 } from '@heroicons/react/24/solid';
 
 const navigation = [
@@ -33,6 +35,7 @@ const navigation = [
   { name: 'Textes Résumés', href: '/text-resumes', icon: DocumentTextIcon, iconSolid: DocumentTextIconSolid },
   { name: 'Annonces', href: '/annonces', icon: MegaphoneIcon, iconSolid: MegaphoneIconSolid },
   { name: 'Lives', href: '/lives', icon: VideoCameraIcon, iconSolid: VideoCameraIconSolid },
+  { name: 'LiveKit Stream', href: '/livekit', icon: SignalIcon, iconSolid: SignalIconSolid },
   { name: 'Calendrier', href: '/calendar', icon: CalendarIcon, iconSolid: CalendarIconSolid },
   { name: 'Utilisateurs', href: '/users', icon: UserGroupIcon, iconSolid: UserGroupIconSolid },
   { name: 'Notifications', href: '/notifications', icon: BellIcon, iconSolid: BellIconSolid },

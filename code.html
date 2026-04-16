@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ethereal Loading</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;700;800&amp;family=Inter:wght@100;300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "inverse-primary": "#494bd6",
+              "on-primary-fixed-variant": "#2f2ebe",
+              "on-primary-fixed": "#07006c",
+              "surface-container-low": "#131b2e",
+              "surface-container-lowest": "#060e20",
+              "secondary-fixed": "#d4e4fa",
+              "surface": "#0b1326",
+              "surface-container-high": "#222a3d",
+              "surface-tint": "#c0c1ff",
+              "primary-fixed-dim": "#c0c1ff",
+              "tertiary-fixed": "#e0e0ff",
+              "surface-container-highest": "#2d3449",
+              "on-surface-variant": "#c8c5cd",
+              "on-secondary-fixed-variant": "#39485a",
+              "on-secondary": "#233143",
+              "on-tertiary-fixed-variant": "#2f3aa3",
+              "inverse-surface": "#dae2fd",
+              "surface-container": "#171f33",
+              "on-tertiary-fixed": "#000767",
+              "on-tertiary": "#131e8c",
+              "tertiary": "#bdc2ff",
+              "surface-bright": "#31394d",
+              "primary": "#c0c1ff",
+              "on-primary-container": "#7174ff",
+              "outline": "#919097",
+              "tertiary-fixed-dim": "#bdc2ff",
+              "inverse-on-surface": "#283044",
+              "surface-dim": "#0b1326",
+              "on-error-container": "#ffdad6",
+              "on-primary": "#1000a9",
+              "tertiary-container": "#00076a",
+              "on-secondary-container": "#a7b6cc",
+              "on-tertiary-container": "#707be6",
+              "error": "#ffb4ab",
+              "error-container": "#93000a",
+              "secondary-container": "#39485a",
+              "primary-fixed": "#e1e0ff",
+              "on-error": "#690005",
+              "surface-variant": "#2d3449",
+              "secondary": "#b9c8de",
+              "on-secondary-fixed": "#0d1c2d",
+              "background": "#0b1326",
+              "primary-container": "#07006f",
+              "on-surface": "#dae2fd",
+              "secondary-fixed-dim": "#b9c8de",
+              "outline-variant": "#47464c",
+              "on-background": "#dae2fd"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        @keyframes vertical-scroll {
+            0%, 15% { transform: translateY(60px); }
+            20%, 35% { transform: translateY(0px); }
+            40%, 55% { transform: translateY(-60px); }
+            60%, 75% { transform: translateY(-120px); }
+            80%, 95% { transform: translateY(-180px); }
+            100% { transform: translateY(-240px); }
+        }
+
+        .scroll-container {
+            height: 60px; /* Height of one active word */
+            overflow: visible;
+        }
+
+        .scroll-content {
+            animation: vertical-scroll 15s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .word-item {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s ease;
+            font-family: 'Manrope', sans-serif;
+            font-size: 2.25rem;
+            font-weight: 300;
+            color: rgba(218, 226, 253, 0.15); /* Dimmed */
+            width: 100%;
+        }
+
+        /* The scrolling logic visually targets the center. 
+           We use JS or CSS trickery to highlight the "active" word in the middle viewport. 
+           For a pure CSS version that looks like the reference, we can stack them and use mask-images. */
+        
+        .fade-mask {
+            mask-image: linear-gradient(to bottom, transparent, black 40%, black 60%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 40%, black 60%, transparent);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body overflow-hidden">
+<!-- Ambient Background Gradients -->
+<div class="fixed inset-0 pointer-events-none">
+<div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary-container/20 blur-[120px] rounded-full"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-tertiary-container/10 blur-[150px] rounded-full"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_transparent_0%,_#0b1326_80%)]"></div>
+</div>
+<!-- Top AppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-center items-center px-8 py-6 pt-10 bg-[#0b1326]">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#c0c1ff]" style="font-variation-settings: 'FILL' 0;">blur_on</span>
+<span class="font-['Manrope'] tracking-[0.2em] uppercase text-sm font-light text-[#c0c1ff] opacity-80">ETHEREAL</span>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="relative flex flex-col items-center justify-center min-h-screen px-6">
+<!-- Pulsing Brand Mark -->
+<div class="mb-16 flex flex-col items-center">
+<div class="relative w-20 h-20 flex items-center justify-center">
+<div class="absolute inset-0 bg-primary/20 blur-[32px] rounded-full"></div>
+<div class="w-10 h-10 border-[0.5px] border-primary/30 rounded-full flex items-center justify-center bg-surface-container-highest/40 backdrop-blur-xl">
+<span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">motion_photos_on</span>
+</div>
+</div>
+</div>
+<!-- Vertical Word Slider based on IMAGE_4 -->
+<div class="relative w-full flex flex-col items-center">
+<!-- Container for the 3-word stack view -->
+<div class="relative h-[180px] w-full flex flex-col items-center justify-center overflow-hidden fade-mask">
+<div class="scroll-content flex flex-col items-center">
+<div class="word-item">Réseau</div>
+<div class="word-item">Noyau</div>
+<div class="word-item text-on-surface opacity-100 font-normal">Module</div>
+<div class="word-item">Système</div>
+<div class="word-item">Interface</div>
+<div class="word-item">Réseau</div> <!-- Loop start -->
+<div class="word-item">Noyau</div>
+</div>
+</div>
+<!-- Highlight glow for the center active word -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-12 bg-primary/5 blur-xl rounded-full pointer-events-none"></div>
+</div>
+<!-- Subtitle Context -->
+<div class="mt-12 text-center max-w-xs">
+<p class="text-on-surface-variant font-body text-xs tracking-[0.1em] uppercase leading-relaxed opacity-40">
+                Initialisation des services
+            </p>
+</div>
+<!-- Progress Bar -->
+<div class="mt-16 w-32 h-[1px] bg-surface-container-highest/50 relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-primary/40 to-transparent w-full animate-[shimmer_2s_infinite]"></div>
+</div>
+</main>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-6 pb-8 pt-4 bg-transparent backdrop-blur-xl rounded-t-[32px] border-t-[0.5px] border-white/5">
+<div class="flex flex-col items-center justify-center bg-[#c0c1ff]/10 text-[#c0c1ff] rounded-full p-3 scale-110 cursor-pointer">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">hourglass_empty</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface/30 p-3 hover:text-[#c0c1ff] transition-all cursor-pointer">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">motion_photos_on</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface/30 p-3 hover:text-[#c0c1ff] transition-all cursor-pointer">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings_input_component</span>
+</div>
+</nav>
+<style>
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Ensure the active word looks distinct as it passes through the center */
+        /* Note: Pure CSS scroll-driven animation is experimental, so we rely on the keyframe timing to match visibility */
+    </style>
+</body></html>
