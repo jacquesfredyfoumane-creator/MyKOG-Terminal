@@ -6,20 +6,28 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "veilleur": "node -e \"const Veilleur = require('./veilleur'); const v = new Veilleur(14); v.start();\""
+    "veilleur": "node -e \"const Veilleur = require('./veilleur'); const v = new Veilleur(14); v.start();\"",
+    "livekit:start": "bash start_livekit.sh",
+    "livekit:stop": "bash stop_livekit.sh",
+    "livekit:logs": "tail -f livekit.log",
+    "start:all": "bash start_livekit.sh && node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@apidevtools/swagger-parser": "^12.1.0",
     "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
     "dotenv": "^15.0.1",
     "express": "^5.1.0",
     "firebase-admin": "^13.6.0",
+    "livekit-server-sdk": "^2.15.1",
     "multer": "^2.0.2",
-    "multer-storage-cloudinary": "^4.0.0"
+    "multer-storage-cloudinary": "^4.0.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

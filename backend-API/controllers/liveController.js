@@ -10,9 +10,20 @@ const {
   generateStreamKey 
 } = require('../utils/stream_helper');
 const FFmpegTranscoder = require('../utils/ffmpeg_transcoder');
+const LiveKitService = require('../services/livekitService');
 
 // Gestionnaire global des transcoders actifs
 const activeTranscoders = new Map();
+
+// Instance LiveKit Service (initialisée paresseusement)
+let liveKitService = null;
+
+const getLiveKitService = () => {
+  if (!liveKitService) {
+    liveKitService = new LiveKitService();
+  }
+  return liveKitService;
+};
 
 // Créer un live stream
 const createLiveStream = async (req, res) => {
@@ -616,6 +627,234 @@ const deleteLiveStream = async (req, res) => {
   }
 };
 
+// ===== FONCTIONS LIVEKIT =====
+
+// Créer une room LiveKit
+const createLiveKitRoom = async (req, res) => {
+  try {
+    const { roomName, maxParticipants = 1000 } = req.body;
+
+    console.log('createLiveKitRoom - roomName:', roomName, 'maxParticipants:', maxParticipants);
+
+    if (!roomName) {
+      return res.status(400).json({
+        error: 'roomName est requis'
+      });
+    }
+
+    console.log('Appel de getLiveKitService()...');
+    const service = getLiveKitService();
+    console.log('Service obtenu, appel de createRoom...');
+    
+    const room = await service.createRoom(roomName, {
+      maxParticipants
+    });
+    
+    console.log('Room créée:', room);
+
+    res.status(201).json({
+      message: 'Room LiveKit créée avec succès',
+      room: {
+        name: room.name,
+        sid: room.sid,
+        maxParticipants: room.maxParticipants,
+        participantCount: room.participantCount,
+        createdAt: room.createdAt
+      }
+    });
+  } catch (error) {
+    console.error('Erreur création room LiveKit:', error);
+    res.status(500).json({
+      error: 'Erreur lors de la création de la room LiveKit',
+      details: error.message
+    });
+  }
+};
+
+// Générer un token LiveKit
+const getLiveKitToken = async (req, res) => {
+  try {
+    const { roomName, participantName, isHost = false } = req.body;
+
+    if (!roomName || !participantName) {
+      return res.status(400).json({
+        error: 'roomName et participantName sont requis'
+      });
+    }
+
+    const token = await getLiveKitService().generateParticipantToken(
+      roomName,
+      participantName,
+      isHost
+    );
+
+    res.json({
+      token,
+      roomName,
+      participantName,
+      isHost,
+      liveKitUrl: process.env.LIVEKIT_URL
+    });
+  } catch (error) {
+    console.error('Erreur génération token LiveKit:', error);
+    res.status(500).json({
+      error: 'Erreur lors de la génération du token LiveKit',
+      details: error.message
+    });
+  }
+};
+
+// Lister les rooms LiveKit
+const listLiveKitRooms = async (req, res) => {
+  try {
+    const rooms = await getLiveKitService().listRooms();
+    
+    res.json({
+      rooms: rooms.map(room => ({
+        name: room.name,
+        sid: room.sid,
+        maxParticipants: room.maxParticipants,
+        participantCount: room.participantCount,
+        createdAt: room.createdAt
+      }))
+    });
+  } catch (error) {
+    console.error('Erreur listage rooms LiveKit:', error);
+    res.status(500).json({
+      error: 'Erreur lors du listage des rooms LiveKit',
+      details: error.message
+    });
+  }
+};
+
+// Supprimer une room LiveKit
+const deleteLiveKitRoom = async (req, res) => {
+  try {
+    const { roomName } = req.params;
+
+    await getLiveKitService().deleteRoom(roomName);
+
+    res.json({
+      message: `Room ${roomName} supprimée avec succès`
+    });
+  } catch (error) {
+    console.error('Erreur suppression room LiveKit:', error);
+    res.status(500).json({
+      error: 'Erreur lors de la suppression de la room LiveKit',
+      details: error.message
+    });
+  }
+};
+
+// Démarrer un enregistrement LiveKit
+const startLiveKitRecording = async (req, res) => {
+  try {
+    const { roomName, outputUrl } = req.body;
+
+    if (!roomName) {
+      return res.status(400).json({
+        error: 'roomName est requis'
+      });
+    }
+
+    const egress = await getLiveKitService().startRecording(roomName, outputUrl);
+
+    res.status(201).json({
+      message: 'Enregistrement démarré avec succès',
+      egress: {
+        egressId: egress.egressId,
+        roomName: egress.roomName,
+        status: egress.status,
+        startedAt: egress.startedAt
+      }
+    });
+  } catch (error) {
+    console.error('Erreur démarrage enregistrement LiveKit:', error);
+    res.status(500).json({
+      error: 'Erreur lors du démarrage de l\'enregistrement LiveKit',
+      details: error.message
+    });
+  }
+};
+
+// Configuration OBS complète pour LiveKit
+const getLiveKitObsConfig = async (req, res) => {
+  try {
+    const { roomName = 'mykog-live', hostName = 'obs-broadcaster' } = req.body;
+
+    // Déterminer l'IP locale
+    const { getServerIP } = require('../utils/stream_helper');
+    const serverIP = getServerIP();
+
+    // Créer la room si elle n'existe pas encore
+    const service = getLiveKitService();
+    try {
+      await service.createRoom(roomName, { maxParticipants: 500 });
+    } catch (e) {
+      // Room probablement déjà existante, continuer
+    }
+
+    // Générer le token host pour OBS (WHIP)
+    const obsToken = await service.generateParticipantToken(roomName, hostName, true);
+
+    // Générer un token viewer pour le frontend Flutter
+    const viewerToken = await service.generateParticipantToken(roomName, 'flutter-viewer', false);
+
+    res.json({
+      livekit: {
+        serverUrl: `ws://${serverIP}:7880`,
+        apiKey: process.env.LIVEKIT_API_KEY,
+        roomName,
+      },
+      obs: {
+        // Pour OBS 30+ (WHIP)
+        whip: {
+          url: `http://${serverIP}:7880/rtc`,
+          bearerToken: obsToken,
+          instructions: 'OBS > Paramètres > Flux > Service: WHIP, coller URL et Bearer Token',
+        },
+        // Pour OBS classique (RTMP via nginx)
+        rtmp: {
+          url: `rtmp://${serverIP}:1935/live`,
+          streamKey: roomName,
+          instructions: 'OBS > Paramètres > Flux > Service: Personnalisé, coller URL et Stream Key',
+        },
+      },
+      flutter: {
+        viewerToken,
+        serverUrl: `ws://${serverIP}:7880`,
+        roomName,
+        instructions: 'Utiliser viewerToken + serverUrl dans le widget LiveKit Flutter',
+      },
+    });
+  } catch (error) {
+    console.error('Erreur config OBS LiveKit:', error);
+    res.status(500).json({
+      error: 'Erreur lors de la génération de la config OBS',
+      details: error.message,
+    });
+  }
+};
+
+// Arrêter un enregistrement LiveKit
+const stopLiveKitRecording = async (req, res) => {
+  try {
+    const { egressId } = req.params;
+
+    await getLiveKitService().stopRecording(egressId);
+
+    res.json({
+      message: `Enregistrement ${egressId} arrêté avec succès`
+    });
+  } catch (error) {
+    console.error('Erreur arrêt enregistrement LiveKit:', error);
+    res.status(500).json({
+      error: 'Erreur lors de l\'arrêt de l\'enregistrement LiveKit',
+      details: error.message
+    });
+  }
+};
+
 module.exports = {
   createLiveStream,
   getAllLiveStreams,
@@ -628,5 +867,13 @@ module.exports = {
   decrementViewerCount,
   getViewerCount,
   deleteLiveStream,
+  // LiveKit
+  createLiveKitRoom,
+  getLiveKitToken,
+  listLiveKitRooms,
+  deleteLiveKitRoom,
+  startLiveKitRecording,
+  stopLiveKitRecording,
+  getLiveKitObsConfig,
 };
 
